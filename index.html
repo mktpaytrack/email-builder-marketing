@@ -1,194 +1,662 @@
-
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Email Builder — easyone × Paytrack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: var(--font-sans); }
-.app { padding: 1.5rem 0; }
-.tabs { display: flex; gap: 8px; margin-bottom: 1.5rem; }
-.tab-btn { flex: 1; padding: 10px 16px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-secondary); font-size: 14px; cursor: pointer; transition: all 0.15s; font-family: var(--font-sans); }
-.tab-btn.active { background: var(--color-background-secondary); color: var(--color-text-primary); border-color: var(--color-border-primary); font-weight: 500; }
-.panel { display: none; }
-.panel.active { display: block; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ── IMAGE MODE ── */
-.section-label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 8px; }
-.img-row { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; margin-bottom: 10px; align-items: start; }
-.img-row.full { grid-template-columns: minmax(0,1fr); }
-.img-slot { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); background: var(--color-background-secondary); padding: 10px; }
-.img-slot-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.img-slot-label { font-size: 12px; color: var(--color-text-secondary); font-weight: 500; }
-.img-preview { width: 100%; height: 64px; object-fit: contain; border-radius: 4px; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); display: block; }
-.img-placeholder { width: 100%; height: 64px; border-radius: 4px; background: var(--color-background-primary); border: 0.5px dashed var(--color-border-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--color-text-tertiary); font-size: 12px; gap: 6px; }
-.img-placeholder:hover { border-color: var(--color-border-primary); color: var(--color-text-secondary); }
-.link-input { width: 100%; font-size: 12px; padding: 5px 8px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); font-family: var(--font-sans); margin-top: 6px; }
-.link-input:focus { outline: none; border-color: var(--color-border-primary); }
-.remove-btn { background: none; border: none; cursor: pointer; color: var(--color-text-tertiary); padding: 2px; border-radius: 4px; line-height: 1; }
-.remove-btn:hover { color: var(--color-text-danger); }
+:root {
+  --brand-yellow: #F5C800;
+  --brand-navy: #1A2E4A;
+  --brand-navy-light: #2A4266;
+  --surface: #F7F8FA;
+  --surface-2: #EDEEF2;
+  --border: #E0E2E9;
+  --border-strong: #C8CAD4;
+  --text-primary: #111827;
+  --text-secondary: #6B7280;
+  --text-tertiary: #9CA3AF;
+  --white: #FFFFFF;
+  --green: #16A34A;
+  --green-bg: #F0FDF4;
+  --blue: #2563EB;
+  --blue-bg: #EFF6FF;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+}
 
-.add-row-bar { display: flex; gap: 8px; margin-bottom: 1rem; }
-.add-row-bar button { flex: 1; padding: 8px; border: 0.5px dashed var(--color-border-secondary); border-radius: var(--border-radius-md); background: none; color: var(--color-text-secondary); font-size: 13px; cursor: pointer; font-family: var(--font-sans); }
-.add-row-bar button:hover { background: var(--color-background-secondary); border-color: var(--color-border-primary); color: var(--color-text-primary); }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--surface);
+  color: var(--text-primary);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+}
 
-/* ── CODE MODE ── */
-.block-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1rem; }
-.block-btn { padding: 6px 12px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-secondary); font-size: 12px; cursor: pointer; font-family: var(--font-sans); display: flex; align-items: center; gap: 6px; }
-.block-btn:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
-.block-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
-.block-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); background: var(--color-background-secondary); overflow: hidden; }
-.block-card-header { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 0.5px solid var(--color-border-tertiary); background: var(--color-background-primary); }
-.block-type-badge { font-size: 11px; padding: 2px 8px; border-radius: 99px; background: var(--color-background-info); color: var(--color-text-info); font-weight: 500; }
-.block-card-body { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
-.block-input { width: 100%; font-size: 13px; padding: 6px 8px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); font-family: var(--font-sans); }
-.block-input:focus { outline: none; border-color: var(--color-border-primary); }
-textarea.block-input { min-height: 70px; resize: vertical; }
-.block-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.block-sub-label { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 3px; }
-.move-btn { background: none; border: none; cursor: pointer; color: var(--color-text-tertiary); padding: 2px 4px; font-size: 14px; border-radius: 4px; line-height: 1; font-family: var(--font-sans); }
-.move-btn:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
+/* ── TOPBAR ── */
+.topbar {
+  background: var(--brand-navy);
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-md);
+}
+.topbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.topbar-logo-mark {
+  width: 28px;
+  height: 28px;
+  background: var(--brand-yellow);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.topbar-logo-mark svg { width: 16px; height: 16px; }
+.topbar-title { color: #fff; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+.topbar-subtitle { color: rgba(255,255,255,0.45); font-size: 13px; margin-left: 4px; }
+.topbar-actions { display: flex; gap: 8px; }
 
-/* ── SHARED ── */
-.generate-bar { display: flex; gap: 8px; margin-top: 1.5rem; align-items: center; }
-.gen-btn { flex: 1; padding: 10px 16px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-primary); border-radius: var(--border-radius-md); font-size: 14px; font-weight: 500; cursor: pointer; color: var(--color-text-primary); font-family: var(--font-sans); display: flex; align-items: center; justify-content: center; gap: 8px; }
-.gen-btn:hover { border-color: var(--color-border-secondary); }
-.gen-btn:active { transform: scale(0.98); }
-.copy-btn { padding: 10px 14px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: none; font-size: 13px; cursor: pointer; color: var(--color-text-secondary); font-family: var(--font-sans); display: flex; align-items: center; gap: 6px; }
-.copy-btn:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
-.output-area { margin-top: 1rem; }
-.output-box { width: 100%; min-height: 120px; font-size: 11px; font-family: var(--font-mono); padding: 10px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); background: var(--color-background-secondary); color: var(--color-text-secondary); resize: vertical; }
-.output-box:focus { outline: none; }
-.status-msg { font-size: 12px; color: var(--color-text-success); padding: 4px 0; }
-.color-row { display: flex; gap: 8px; align-items: center; }
-.color-swatch { width: 32px; height: 32px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); cursor: pointer; }
-.section-divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 1.25rem 0; }
-.settings-row { display: flex; gap: 8px; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
-.settings-label { font-size: 13px; color: var(--color-text-secondary); min-width: 80px; }
-select.block-input { cursor: pointer; }
+/* ── LAYOUT ── */
+.workspace {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  min-height: calc(100vh - 56px);
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  background: var(--white);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  max-height: calc(100vh - 56px);
+  position: sticky;
+  top: 56px;
+}
+
+.mode-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.mode-tab {
+  padding: 12px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+}
+.mode-tab:hover { color: var(--text-primary); background: var(--surface-2); }
+.mode-tab.active {
+  color: var(--brand-navy);
+  background: var(--white);
+  border-bottom-color: var(--brand-yellow);
+  font-weight: 600;
+}
+
+.sidebar-body { padding: 16px; flex: 1; }
+.sidebar-section { margin-bottom: 20px; }
+.sidebar-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+
+/* Settings row */
+.settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.setting-item { display: flex; flex-direction: column; gap: 4px; }
+.setting-label { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
+select.setting-input, input.setting-input {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--text-primary);
+  background: var(--white);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+select.setting-input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; padding-right: 28px; }
+select.setting-input:focus, input.setting-input:focus { outline: none; border-color: var(--brand-navy); }
+
+.color-setting { display: flex; align-items: center; gap: 6px; }
+.color-swatch-input { width: 32px; height: 32px; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; padding: 2px; background: var(--white); }
+
+/* Block toolbar */
+.block-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.block-btn {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  color: var(--text-secondary);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.12s;
+}
+.block-btn:hover { background: var(--surface); border-color: var(--brand-navy); color: var(--brand-navy); }
+.block-btn svg { flex-shrink: 0; }
+
+/* Add row area */
+.add-row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.add-row-btn {
+  padding: 10px;
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-secondary);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.12s;
+}
+.add-row-btn:hover { border-color: var(--brand-navy); color: var(--brand-navy); background: var(--blue-bg); }
+
+/* ── CONTENT PANEL ── */
+.content { padding: 24px; overflow-y: auto; }
+.content-header { margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+.content-title { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+.content-subtitle { font-size: 12px; color: var(--text-tertiary); margin-top: 2px; }
+
+/* Row/block list */
+.items-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; min-height: 80px; }
+.empty-state {
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 13px;
+}
+.empty-state-icon { font-size: 28px; margin-bottom: 8px; }
+.empty-state-text { font-weight: 500; margin-bottom: 4px; color: var(--text-secondary); }
+
+/* Row card */
+.item-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--white);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.item-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  cursor: grab;
+}
+.item-card-header:active { cursor: grabbing; }
+.item-drag { color: var(--text-tertiary); cursor: grab; }
+.item-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: var(--brand-navy);
+  color: var(--white);
+}
+.item-tag.img { background: #7C3AED; }
+.item-tag.code { background: var(--blue); }
+.item-label { font-size: 12px; font-weight: 500; flex: 1; color: var(--text-secondary); }
+.item-actions { display: flex; gap: 4px; }
+.item-action-btn {
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  transition: all 0.1s;
+}
+.item-action-btn:hover { background: var(--surface-2); color: var(--text-primary); }
+.item-action-btn.danger:hover { background: #FEF2F2; color: #DC2626; }
+.item-card-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+
+/* Image slots */
+.img-slots-grid { display: grid; gap: 8px; }
+.img-slots-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+.img-slot {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.img-slot-upload {
+  border: 1.5px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  height: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  gap: 4px;
+  color: var(--text-tertiary);
+  font-size: 11px;
+  font-weight: 500;
+  transition: all 0.12s;
+  background: var(--surface);
+}
+.img-slot-upload:hover { border-color: var(--brand-navy); color: var(--brand-navy); background: var(--blue-bg); }
+.img-slot-preview { width: 100%; height: 72px; object-fit: cover; display: block; }
+.img-slot-link {
+  width: 100%;
+  padding: 6px 8px;
+  border: none;
+  border-top: 1px solid var(--border);
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  color: var(--text-secondary);
+  background: var(--white);
+  font-family: 'JetBrains Mono', monospace;
+}
+.img-slot-link:focus { outline: none; background: var(--blue-bg); }
+.img-slot-link::placeholder { color: var(--text-tertiary); }
+
+/* Code block fields */
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.field-group { display: flex; flex-direction: column; gap: 3px; }
+.field-label { font-size: 11px; font-weight: 500; color: var(--text-secondary); }
+.field-input {
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--text-primary);
+  background: var(--white);
+  width: 100%;
+}
+.field-input:focus { outline: none; border-color: var(--brand-navy); }
+textarea.field-input { min-height: 72px; resize: vertical; line-height: 1.5; }
+.field-color {
+  width: 36px;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  padding: 2px;
+  background: var(--white);
+}
+.field-color-row { display: flex; align-items: center; gap: 6px; }
+
+/* ── OUTPUT ── */
+.output-section {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.output-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.output-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.output-actions { display: flex; gap: 6px; }
+.output-textarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 14px 16px;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-secondary);
+  background: #FAFAFA;
+  resize: vertical;
+  line-height: 1.6;
+}
+.output-textarea:focus { outline: none; }
+
+/* ── BUTTONS ── */
+.btn {
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.12s;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.btn:active { transform: scale(0.98); }
+.btn-primary { background: var(--brand-navy); color: var(--white); }
+.btn-primary:hover { background: var(--brand-navy-light); }
+.btn-yellow { background: var(--brand-yellow); color: var(--brand-navy); border-color: var(--brand-yellow); }
+.btn-yellow:hover { background: #e5b900; }
+.btn-ghost { background: var(--white); color: var(--text-secondary); border-color: var(--border); }
+.btn-ghost:hover { background: var(--surface); color: var(--text-primary); border-color: var(--border-strong); }
+.btn-sm { padding: 6px 10px; font-size: 12px; }
+
+/* ── TOAST ── */
+#toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--brand-navy);
+  color: var(--white);
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all 0.2s;
+  pointer-events: none;
+  z-index: 999;
+}
+#toast.show { opacity: 1; transform: translateY(0); }
+#toast.success { background: var(--green); }
+
+/* Move btns in item actions */
+.move-btn-group { display: flex; }
 </style>
+</head>
+<body>
 
-<div class="app">
-  <h2 class="sr-only">Construtor de e-mail marketing HTML</h2>
-
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('images')"><i class="ti ti-photo" aria-hidden="true"></i> Modo imagens</button>
-    <button class="tab-btn" onclick="switchTab('code')"><i class="ti ti-code" aria-hidden="true"></i> Modo código</button>
+<div class="topbar">
+  <div class="topbar-logo">
+    <div class="topbar-logo-mark">
+      <svg viewBox="0 0 16 16" fill="none"><polygon points="8,1 15,13 1,13" fill="#1A2E4A"/></svg>
+    </div>
+    <span class="topbar-title">Email Builder</span>
+    <span class="topbar-subtitle">easyone × Paytrack</span>
   </div>
-
-  <!-- ══════════════ IMAGE MODE ══════════════ -->
-  <div id="panel-images" class="panel active">
-    <div class="settings-row">
-      <span class="settings-label">Largura</span>
-      <select class="block-input" id="img-width" style="width:120px;">
-        <option value="600">600px</option>
-        <option value="640">640px</option>
-        <option value="700">700px</option>
-      </select>
-      <span class="settings-label" style="margin-left:8px;">Fundo</span>
-      <input type="color" id="img-bg" value="#f4f4f4" class="color-swatch" title="Cor de fundo do e-mail">
-    </div>
-
-    <div id="img-rows-container"></div>
-
-    <div class="add-row-bar">
-      <button onclick="addImgRow('full')"><i class="ti ti-layout-rows" aria-hidden="true"></i> + Linha única</button>
-      <button onclick="addImgRow('half')"><i class="ti ti-layout-columns" aria-hidden="true"></i> + Duas colunas</button>
-    </div>
-
-    <div class="generate-bar">
-      <button class="gen-btn" onclick="generateImgHTML()"><i class="ti ti-download" aria-hidden="true"></i> Gerar HTML</button>
-      <button class="copy-btn" onclick="copyOutput('img-output')"><i class="ti ti-copy" aria-hidden="true"></i> Copiar</button>
-    </div>
-    <div id="img-status" class="status-msg" style="display:none;"></div>
-    <div class="output-area">
-      <textarea class="output-box" id="img-output" placeholder="O HTML gerado aparecerá aqui..." readonly></textarea>
-    </div>
-  </div>
-
-  <!-- ══════════════ CODE MODE ══════════════ -->
-  <div id="panel-code" class="panel">
-    <div class="settings-row">
-      <span class="settings-label">Largura</span>
-      <select class="block-input" id="code-width" style="width:120px;">
-        <option value="600">600px</option>
-        <option value="640">640px</option>
-        <option value="700">700px</option>
-      </select>
-      <span class="settings-label" style="margin-left:8px;">Fundo</span>
-      <input type="color" id="code-bg" value="#f4f4f4" class="color-swatch" title="Cor de fundo do e-mail">
-    </div>
-
-    <p class="section-label">Adicionar blocos</p>
-    <div class="block-toolbar">
-      <button class="block-btn" onclick="addBlock('header')"><i class="ti ti-heading" aria-hidden="true"></i> Cabeçalho</button>
-      <button class="block-btn" onclick="addBlock('text')"><i class="ti ti-align-left" aria-hidden="true"></i> Texto</button>
-      <button class="block-btn" onclick="addBlock('button')"><i class="ti ti-pointer" aria-hidden="true"></i> Botão CTA</button>
-      <button class="block-btn" onclick="addBlock('divider')"><i class="ti ti-minus" aria-hidden="true"></i> Divisor</button>
-      <button class="block-btn" onclick="addBlock('spacer')"><i class="ti ti-space" aria-hidden="true"></i> Espaço</button>
-      <button class="block-btn" onclick="addBlock('columns')"><i class="ti ti-layout-columns" aria-hidden="true"></i> 2 Colunas</button>
-      <button class="block-btn" onclick="addBlock('footer')"><i class="ti ti-layout-bottombar" aria-hidden="true"></i> Rodapé</button>
-    </div>
-
-    <div id="code-blocks-list" class="block-list"></div>
-
-    <div class="generate-bar">
-      <button class="gen-btn" onclick="generateCodeHTML()"><i class="ti ti-download" aria-hidden="true"></i> Gerar HTML</button>
-      <button class="copy-btn" onclick="copyOutput('code-output')"><i class="ti ti-copy" aria-hidden="true"></i> Copiar</button>
-    </div>
-    <div id="code-status" class="status-msg" style="display:none;"></div>
-    <div class="output-area">
-      <textarea class="output-box" id="code-output" placeholder="O HTML gerado aparecerá aqui..." readonly></textarea>
-    </div>
+  <div class="topbar-actions">
+    <button class="btn btn-ghost btn-sm" onclick="clearAll()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6l-1 14H6L5 6M8 6V4h8v2"/></svg>
+      Limpar
+    </button>
+    <button class="btn btn-yellow btn-sm" onclick="generateHTML()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+      Gerar HTML
+    </button>
   </div>
 </div>
 
-<script>
-const imgRows = [];
-const codeBlocks = [];
-let imgRowCounter = 0;
-let blockCounter = 0;
+<div class="workspace">
 
-function switchTab(tab) {
-  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (i===0&&tab==='images')||(i===1&&tab==='code')));
-  document.getElementById('panel-images').classList.toggle('active', tab==='images');
-  document.getElementById('panel-code').classList.toggle('active', tab==='code');
-}
-
-/* ─────────────────── IMAGE MODE ─────────────────── */
-function addImgRow(type) {
-  const id = ++imgRowCounter;
-  const row = { id, type, slots: type==='full' ? [{ id: id+'a', src: null, link: '' }] : [{ id: id+'a', src: null, link: '' }, { id: id+'b', src: null, link: '' }] };
-  imgRows.push(row);
-  renderImgRows();
-}
-
-function removeImgRow(id) {
-  const idx = imgRows.findIndex(r => r.id === id);
-  if (idx !== -1) imgRows.splice(idx, 1);
-  renderImgRows();
-}
-
-function renderImgRows() {
-  const container = document.getElementById('img-rows-container');
-  container.innerHTML = imgRows.map((row, ri) => `
-    <div class="img-row ${row.type==='full'?'full':''}" data-row="${row.id}">
-      ${row.slots.map((slot, si) => `
-        <div class="img-slot">
-          <div class="img-slot-header">
-            <span class="img-slot-label">${row.type==='full'?'Imagem '+(ri+1):'Imagem '+(ri+1)+(si===0?'A':'B')}</span>
-            ${si===0?`<button class="remove-btn" onclick="removeImgRow(${row.id})" title="Remover linha"><i class="ti ti-x" aria-hidden="true"></i></button>`:''}
-          </div>
-          ${slot.src
-            ? `<img src="${slot.src}" class="img-preview" alt="">`
-            : `<div class="img-placeholder" onclick="triggerFileInput('${row.id}','${slot.id}')"><i class="ti ti-upload" style="font-size:16px" aria-hidden="true"></i><span>Clique para enviar</span></div>`
-          }
-          <input type="file" accept="image/*" style="display:none" id="file-${slot.id}" onchange="handleFile(event,'${row.id}','${slot.id}')">
-          <input type="text" class="link-input" placeholder="URL do link (opcional)" value="${slot.link}" oninput="updateSlotLink('${row.id}','${slot.id}',this.value)">
-        </div>
-      `).join('')}
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar">
+    <div class="mode-tabs">
+      <button class="mode-tab active" id="tab-images" onclick="switchMode('images')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        Imagens
+      </button>
+      <button class="mode-tab" id="tab-code" onclick="switchMode('code')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        Código
+      </button>
     </div>
-  `).join('');
+
+    <div class="sidebar-body">
+
+      <!-- Settings -->
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Configurações</div>
+        <div class="settings-grid">
+          <div class="setting-item">
+            <span class="setting-label">Largura</span>
+            <select class="setting-input" id="email-width">
+              <option value="600">600px</option>
+              <option value="640">640px</option>
+              <option value="700">700px</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <span class="setting-label">Fundo</span>
+            <div class="color-setting">
+              <input type="color" class="color-swatch-input" id="email-bg" value="#f4f4f4">
+              <span style="font-size:11px;color:var(--text-secondary);font-family:'JetBrains Mono',monospace;" id="email-bg-label">#f4f4f4</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Image mode controls -->
+      <div id="sidebar-images" class="sidebar-section">
+        <div class="sidebar-section-title">Adicionar linha</div>
+        <div class="add-row-grid">
+          <button class="add-row-btn" onclick="addImgRow('full')">
+            <svg width="24" height="16" viewBox="0 0 24 16"><rect x="0" y="0" width="24" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+            Linha única
+          </button>
+          <button class="add-row-btn" onclick="addImgRow('half')">
+            <svg width="24" height="16" viewBox="0 0 24 16"><rect x="0" y="0" width="11" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="13" y="0" width="11" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+            Duas colunas
+          </button>
+        </div>
+        <div style="margin-top:12px;padding:10px;background:var(--blue-bg);border-radius:var(--radius-sm);border:1px solid #BFDBFE;">
+          <p style="font-size:11px;color:#1D4ED8;line-height:1.5;">
+            <strong>Dica:</strong> Imagens são embarcadas em base64 no HTML. Para arquivos menores, hospede as imagens e use URLs externas nos links.
+          </p>
+        </div>
+      </div>
+
+      <!-- Code mode controls -->
+      <div id="sidebar-code" class="sidebar-section" style="display:none;">
+        <div class="sidebar-section-title">Blocos de conteúdo</div>
+        <div class="block-grid">
+          <button class="block-btn" onclick="addBlock('header')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h8M4 18h12"/></svg>
+            Cabeçalho
+          </button>
+          <button class="block-btn" onclick="addBlock('text')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
+            Parágrafo
+          </button>
+          <button class="block-btn" onclick="addBlock('button')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="8" rx="4"/></svg>
+            Botão CTA
+          </button>
+          <button class="block-btn" onclick="addBlock('image_url')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            Imagem URL
+          </button>
+          <button class="block-btn" onclick="addBlock('columns')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="18" rx="1"/></svg>
+            2 Colunas
+          </button>
+          <button class="block-btn" onclick="addBlock('divider')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/></svg>
+            Divisor
+          </button>
+          <button class="block-btn" onclick="addBlock('spacer')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="3" x2="12" y2="21"/><polyline points="8 7 12 3 16 7"/><polyline points="8 17 12 21 16 17"/></svg>
+            Espaço
+          </button>
+          <button class="block-btn" onclick="addBlock('footer')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="14" width="20" height="7" rx="2"/><line x1="6" y1="3" x2="6" y2="14"/><line x1="12" y1="3" x2="12" y2="14"/><line x1="18" y1="3" x2="18" y2="14"/></svg>
+            Rodapé
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- ══ CONTENT ══ -->
+  <main class="content">
+    <div class="content-header">
+      <div>
+        <div class="content-title" id="content-title">Linhas de imagem</div>
+        <div class="content-subtitle" id="content-subtitle">Adicione linhas pelo painel lateral e configure cada imagem aqui</div>
+      </div>
+    </div>
+
+    <!-- Items list (images or code blocks) -->
+    <div id="items-list" class="items-list">
+      <div class="empty-state">
+        <div class="empty-state-icon">📧</div>
+        <div class="empty-state-text">Nenhum item ainda</div>
+        Use o painel lateral para adicionar linhas de imagem ao seu e-mail
+      </div>
+    </div>
+
+    <!-- Output -->
+    <div class="output-section">
+      <div class="output-header">
+        <span class="output-title">HTML gerado</span>
+        <div class="output-actions">
+          <button class="btn btn-ghost btn-sm" onclick="copyHTML()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copiar
+          </button>
+          <button class="btn btn-ghost btn-sm" onclick="downloadHTML()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Baixar .html
+          </button>
+        </div>
+      </div>
+      <textarea class="output-textarea" id="html-output" placeholder="Clique em &quot;Gerar HTML&quot; para ver o código aqui..." readonly></textarea>
+    </div>
+  </main>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+let mode = 'images';
+let items = [];
+let counter = 0;
+
+const blockDefs = {
+  header:    { label: 'Cabeçalho',  tag: 'code', fields: [{k:'text',l:'Título',t:'text',p:'Seu título aqui'},{k:'size',l:'Tamanho (px)',t:'text',p:'28',d:'28'},{k:'color',l:'Cor do texto',t:'color',d:'#1a2e4a'},{k:'bg',l:'Cor de fundo',t:'color',d:'#ffffff'},{k:'align',l:'Alinhamento',t:'select',opts:['center','left','right'],d:'center'}] },
+  text:      { label: 'Parágrafo', tag: 'code', fields: [{k:'text',l:'Conteúdo',t:'textarea',p:'Escreva aqui...'},{k:'size',l:'Tamanho (px)',t:'text',p:'15',d:'15'},{k:'color',l:'Cor',t:'color',d:'#444444'},{k:'bg',l:'Fundo',t:'color',d:'#ffffff'}] },
+  button:    { label: 'Botão CTA', tag: 'code', fields: [{k:'text',l:'Texto do botão',t:'text',p:'Clique aqui'},{k:'link',l:'URL',t:'text',p:'https://'},{k:'bg',l:'Cor do botão',t:'color',d:'#F5C800'},{k:'color',l:'Cor do texto',t:'color',d:'#1a2e4a'}] },
+  image_url: { label: 'Imagem URL', tag: 'code', fields: [{k:'src',l:'URL da imagem',t:'text',p:'https://...'},{k:'link',l:'Link ao clicar',t:'text',p:'https://'},{k:'alt',l:'Texto alternativo',t:'text',p:''}] },
+  columns:   { label: '2 Colunas',  tag: 'code', fields: [{k:'left',l:'Coluna esquerda',t:'textarea',p:'Conteúdo...'},{k:'right',l:'Coluna direita',t:'textarea',p:'Conteúdo...'},{k:'color',l:'Cor do texto',t:'color',d:'#444444'},{k:'bg',l:'Fundo',t:'color',d:'#ffffff'}] },
+  divider:   { label: 'Divisor',    tag: 'code', fields: [{k:'color',l:'Cor da linha',t:'color',d:'#eeeeee'},{k:'pad',l:'Espaçamento (px)',t:'text',p:'20',d:'20'}] },
+  spacer:    { label: 'Espaço',     tag: 'code', fields: [{k:'h',l:'Altura (px)',t:'text',p:'20',d:'20'}] },
+  footer:    { label: 'Rodapé',     tag: 'code', fields: [{k:'text',l:'Texto',t:'textarea',p:'© 2025 Empresa...'},{k:'color',l:'Cor',t:'color',d:'#999999'},{k:'bg',l:'Fundo',t:'color',d:'#f9f9f9'}] },
+};
+
+document.getElementById('email-bg').addEventListener('input', function() {
+  document.getElementById('email-bg-label').textContent = this.value;
+});
+
+function switchMode(m) {
+  mode = m;
+  document.getElementById('tab-images').classList.toggle('active', m === 'images');
+  document.getElementById('tab-code').classList.toggle('active', m === 'code');
+  document.getElementById('sidebar-images').style.display = m === 'images' ? '' : 'none';
+  document.getElementById('sidebar-code').style.display = m === 'code' ? '' : 'none';
+  document.getElementById('content-title').textContent = m === 'images' ? 'Linhas de imagem' : 'Blocos de conteúdo';
+  document.getElementById('content-subtitle').textContent = m === 'images'
+    ? 'Adicione linhas pelo painel lateral e configure cada imagem aqui'
+    : 'Adicione e organize os blocos do seu e-mail';
+  items = [];
+  renderItems();
+}
+
+/* ── IMAGE MODE ── */
+function addImgRow(type) {
+  const id = ++counter;
+  items.push({
+    id, mode: 'img', type,
+    slots: type === 'full'
+      ? [{ id: id + '_a', src: null, link: '' }]
+      : [{ id: id + '_a', src: null, link: '' }, { id: id + '_b', src: null, link: '' }]
+  });
+  renderItems();
+}
+
+/* ── CODE MODE ── */
+function addBlock(type) {
+  const id = ++counter;
+  const def = blockDefs[type];
+  const values = {};
+  def.fields.forEach(f => { values[f.k] = f.d || ''; });
+  items.push({ id, mode: 'code', type, values });
+  renderItems();
+}
+
+function removeItem(id) {
+  items = items.filter(i => i.id !== id);
+  renderItems();
+}
+
+function moveItem(id, dir) {
+  const idx = items.findIndex(i => i.id === id);
+  const to = idx + dir;
+  if (to < 0 || to >= items.length) return;
+  [items[idx], items[to]] = [items[to], items[idx]];
+  renderItems();
+}
+
+function updateSlotLink(rowId, slotId, val) {
+  const row = items.find(i => i.id === rowId);
+  if (!row) return;
+  const slot = row.slots.find(s => s.id === slotId);
+  if (slot) slot.link = val;
 }
 
 function triggerFileInput(rowId, slotId) {
-  document.getElementById('file-' + slotId).click();
+  document.getElementById('file_' + slotId).click();
 }
 
 function handleFile(event, rowId, slotId) {
@@ -196,197 +664,207 @@ function handleFile(event, rowId, slotId) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
-    const row = imgRows.find(r => r.id == rowId);
+    const row = items.find(i => i.id === rowId);
     if (!row) return;
     const slot = row.slots.find(s => s.id === slotId);
-    if (!slot) return;
-    slot.src = e.target.result;
-    renderImgRows();
+    if (slot) { slot.src = e.target.result; renderItems(); }
   };
   reader.readAsDataURL(file);
 }
 
-function updateSlotLink(rowId, slotId, val) {
-  const row = imgRows.find(r => r.id == rowId);
-  if (!row) return;
-  const slot = row.slots.find(s => s.id === slotId);
-  if (slot) slot.link = val;
-}
-
-function generateImgHTML() {
-  const width = document.getElementById('img-width').value;
-  const bg = document.getElementById('img-bg').value;
-  const halfW = Math.floor(parseInt(width)/2);
-
-  let rows = '';
-  for (const row of imgRows) {
-    if (row.type === 'full') {
-      const slot = row.slots[0];
-      const imgTag = slot.src ? `<img src="${slot.src}" width="${width}" style="display:block;border:0;max-width:100%;" alt="">` : `<!-- imagem não carregada -->`;
-      rows += `\n        <tr><td style="padding:0;line-height:0;">${slot.link ? `<a href="${slot.link}" target="_blank" style="display:block;">${imgTag}</a>` : imgTag}</td></tr>`;
-    } else {
-      const s0 = row.slots[0], s1 = row.slots[1];
-      const img0 = s0.src ? `<img src="${s0.src}" width="${halfW}" style="display:block;border:0;max-width:100%;" alt="">` : `<!-- imagem não carregada -->`;
-      const img1 = s1.src ? `<img src="${s1.src}" width="${halfW}" style="display:block;border:0;max-width:100%;" alt="">` : `<!-- imagem não carregada -->`;
-      const cell0 = s0.link ? `<a href="${s0.link}" target="_blank" style="display:block;">${img0}</a>` : img0;
-      const cell1 = s1.link ? `<a href="${s1.link}" target="_blank" style="display:block;">${img1}</a>` : img1;
-      rows += `\n        <tr><td style="padding:0;line-height:0;"><table width="${width}" cellpadding="0" cellspacing="0" border="0"><tr><td width="${halfW}" style="padding:0;line-height:0;">${cell0}</td><td width="${halfW}" style="padding:0;line-height:0;">${cell1}</td></tr></table></td></tr>`;
-    }
-  }
-
-  const html = `<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-</head>
-<body style="margin:0;padding:0;background-color:${bg};">
-<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${bg};">
-  <tr><td align="center" style="padding:20px 0;">
-    <table width="${width}" cellpadding="0" cellspacing="0" border="0" style="max-width:${width}px;width:100%;background-color:#ffffff;">${rows}
-    </table>
-  </td></tr>
-</table>
-</body>
-</html>`;
-
-  document.getElementById('img-output').value = html;
-  showStatus('img-status', 'HTML gerado com sucesso!');
-}
-
-/* ─────────────────── CODE MODE ─────────────────── */
-const blockDefs = {
-  header:  { label: 'Cabeçalho', icon: 'ti-heading',        fields: [{ key:'text',    label:'Texto',        type:'text',     placeholder:'Título do e-mail' }, { key:'color', label:'Cor do texto', type:'color', default:'#1a2e4a' }, { key:'bg', label:'Cor de fundo', type:'color', default:'#ffffff' }, { key:'size', label:'Tamanho (px)', type:'text', placeholder:'28', default:'28' }] },
-  text:    { label: 'Texto',     icon: 'ti-align-left',     fields: [{ key:'text',    label:'Conteúdo',     type:'textarea', placeholder:'Escreva o conteúdo do bloco...' }, { key:'color', label:'Cor do texto', type:'color', default:'#444444' }, { key:'bg', label:'Cor de fundo', type:'color', default:'#ffffff' }, { key:'size', label:'Tamanho (px)', type:'text', placeholder:'15', default:'15' }] },
-  button:  { label: 'Botão CTA', icon: 'ti-pointer',        fields: [{ key:'text',    label:'Texto do botão', type:'text',   placeholder:'Clique aqui' }, { key:'link', label:'URL do link', type:'text', placeholder:'https://' }, { key:'bg',   label:'Cor do botão',  type:'color', default:'#f5c800' }, { key:'color', label:'Cor do texto', type:'color', default:'#1a2e4a' }] },
-  divider: { label: 'Divisor',   icon: 'ti-minus',          fields: [{ key:'color',   label:'Cor da linha',  type:'color',   default:'#eeeeee' }, { key:'margin', label:'Margem (px)', type:'text', placeholder:'20', default:'20' }] },
-  spacer:  { label: 'Espaço',    icon: 'ti-space',          fields: [{ key:'height',  label:'Altura (px)',   type:'text',    placeholder:'20', default:'20' }] },
-  columns: { label: '2 Colunas', icon: 'ti-layout-columns', fields: [{ key:'left',    label:'Texto esquerda', type:'textarea', placeholder:'Conteúdo coluna esquerda...' }, { key:'right', label:'Texto direita', type:'textarea', placeholder:'Conteúdo coluna direita...' }, { key:'color', label:'Cor do texto', type:'color', default:'#444444' }, { key:'bg', label:'Cor de fundo', type:'color', default:'#ffffff' }] },
-  footer:  { label: 'Rodapé',    icon: 'ti-layout-bottombar', fields: [{ key:'text',  label:'Texto do rodapé', type:'textarea', placeholder:'© 2025 Empresa. Todos os direitos reservados.' }, { key:'color', label:'Cor do texto', type:'color', default:'#999999' }, { key:'bg', label:'Cor de fundo', type:'color', default:'#f9f9f9' }] },
-};
-
-function addBlock(type) {
-  const id = ++blockCounter;
-  const def = blockDefs[type];
-  const values = {};
-  def.fields.forEach(f => { values[f.key] = f.default || ''; });
-  codeBlocks.push({ id, type, values });
-  renderCodeBlocks();
-}
-
-function removeBlock(id) {
-  const idx = codeBlocks.findIndex(b => b.id === id);
-  if (idx !== -1) codeBlocks.splice(idx, 1);
-  renderCodeBlocks();
-}
-
-function moveBlock(id, dir) {
-  const idx = codeBlocks.findIndex(b => b.id === id);
-  const to = idx + dir;
-  if (to < 0 || to >= codeBlocks.length) return;
-  [codeBlocks[idx], codeBlocks[to]] = [codeBlocks[to], codeBlocks[idx]];
-  renderCodeBlocks();
-}
-
-function updateBlockValue(id, key, val) {
-  const block = codeBlocks.find(b => b.id === id);
+function updateBlockVal(id, key, val) {
+  const block = items.find(i => i.id === id);
   if (block) block.values[key] = val;
 }
 
-function renderCodeBlocks() {
-  const list = document.getElementById('code-blocks-list');
-  list.innerHTML = codeBlocks.map((block, bi) => {
-    const def = blockDefs[block.type];
-    const fields = def.fields.map(f => {
-      const val = block.values[f.key] || '';
-      if (f.type === 'textarea') return `<div><div class="block-sub-label">${f.label}</div><textarea class="block-input" placeholder="${f.placeholder||''}" oninput="updateBlockValue(${block.id},'${f.key}',this.value)">${val}</textarea></div>`;
-      if (f.type === 'color') return `<div><div class="block-sub-label">${f.label}</div><input type="color" class="color-swatch" value="${val||f.default||'#ffffff'}" oninput="updateBlockValue(${block.id},'${f.key}',this.value)"></div>`;
-      return `<div><div class="block-sub-label">${f.label}</div><input type="text" class="block-input" placeholder="${f.placeholder||''}" value="${val}" oninput="updateBlockValue(${block.id},'${f.key}',this.value)"></div>`;
-    });
-
-    return `
-    <div class="block-card">
-      <div class="block-card-header">
-        <i class="ti ${def.icon}" style="font-size:16px;color:var(--color-text-secondary)" aria-hidden="true"></i>
-        <span style="font-size:13px;font-weight:500;flex:1">${def.label}</span>
-        <span class="block-type-badge">${block.type}</span>
-        <button class="move-btn" onclick="moveBlock(${block.id},-1)" title="Mover para cima" ${bi===0?'disabled':''}>↑</button>
-        <button class="move-btn" onclick="moveBlock(${block.id},1)" title="Mover para baixo" ${bi===codeBlocks.length-1?'disabled':''}>↓</button>
-        <button class="remove-btn" onclick="removeBlock(${block.id})" title="Remover bloco"><i class="ti ti-x" aria-hidden="true"></i></button>
-      </div>
-      <div class="block-card-body ${def.fields.length > 2 ? 'block-row' : ''}" style="${def.fields.some(f=>f.type==='textarea')?'display:flex;flex-direction:column;gap:8px;':''}">${fields.join('')}</div>
+function renderItems() {
+  const list = document.getElementById('items-list');
+  if (items.length === 0) {
+    list.innerHTML = `<div class="empty-state">
+      <div class="empty-state-icon">${mode === 'images' ? '🖼️' : '📝'}</div>
+      <div class="empty-state-text">Nenhum item ainda</div>
+      Use o painel lateral para adicionar ${mode === 'images' ? 'linhas de imagem' : 'blocos de conteúdo'}
     </div>`;
+    return;
+  }
+  list.innerHTML = items.map((item, idx) => {
+    if (item.mode === 'img') return renderImgCard(item, idx);
+    return renderCodeCard(item, idx);
   }).join('');
 }
 
-function generateCodeHTML() {
-  const width = document.getElementById('code-width').value;
-  const bg = document.getElementById('code-bg').value;
+function renderImgCard(row, idx) {
+  const slotsHTML = row.slots.map(slot => `
+    <div class="img-slot">
+      <input type="file" accept="image/*" style="display:none" id="file_${slot.id}" onchange="handleFile(event,${row.id},'${slot.id}')">
+      ${slot.src
+        ? `<img src="${slot.src}" class="img-slot-preview" alt="" onclick="triggerFileInput(${row.id},'${slot.id}')" style="cursor:pointer" title="Clique para trocar">`
+        : `<div class="img-slot-upload" onclick="triggerFileInput(${row.id},'${slot.id}')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Enviar imagem
+          </div>`
+      }
+      <input type="text" class="img-slot-link" placeholder="https://link-da-imagem.com" value="${slot.link}" oninput="updateSlotLink(${row.id},'${slot.id}',this.value)">
+    </div>
+  `).join('');
+
+  return `
+  <div class="item-card">
+    <div class="item-card-header">
+      <span class="item-drag">⠿</span>
+      <span class="item-tag img">${row.type === 'full' ? 'Linha única' : 'Duas colunas'}</span>
+      <span class="item-label">Linha ${idx + 1}</span>
+      <div class="item-actions">
+        <div class="move-btn-group">
+          <button class="item-action-btn" onclick="moveItem(${row.id},-1)" title="Subir" ${idx===0?'disabled':''}>↑</button>
+          <button class="item-action-btn" onclick="moveItem(${row.id},1)" title="Descer" ${idx===items.length-1?'disabled':''}>↓</button>
+        </div>
+        <button class="item-action-btn danger" onclick="removeItem(${row.id})" title="Remover">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="item-card-body">
+      <div class="img-slots-grid ${row.type === 'half' ? 'cols-2' : ''}">${slotsHTML}</div>
+    </div>
+  </div>`;
+}
+
+function renderCodeCard(block, idx) {
+  const def = blockDefs[block.type];
+  const fieldsHTML = def.fields.map(f => {
+    const val = block.values[f.k] !== undefined ? block.values[f.k] : (f.d || '');
+    if (f.t === 'textarea') return `
+      <div class="field-group" style="grid-column:1/-1;">
+        <label class="field-label">${f.l}</label>
+        <textarea class="field-input" placeholder="${f.p||''}" oninput="updateBlockVal(${block.id},'${f.k}',this.value)">${val}</textarea>
+      </div>`;
+    if (f.t === 'color') return `
+      <div class="field-group">
+        <label class="field-label">${f.l}</label>
+        <div class="field-color-row">
+          <input type="color" class="field-color" value="${val||f.d||'#ffffff'}" oninput="updateBlockVal(${block.id},'${f.k}',this.value)">
+          <span style="font-size:11px;color:var(--text-tertiary);font-family:'JetBrains Mono',monospace;">${val||f.d||'#ffffff'}</span>
+        </div>
+      </div>`;
+    if (f.t === 'select') return `
+      <div class="field-group">
+        <label class="field-label">${f.l}</label>
+        <select class="setting-input" onchange="updateBlockVal(${block.id},'${f.k}',this.value)">
+          ${f.opts.map(o => `<option value="${o}" ${val===o?'selected':''}>${o}</option>`).join('')}
+        </select>
+      </div>`;
+    return `
+      <div class="field-group">
+        <label class="field-label">${f.l}</label>
+        <input type="text" class="field-input" placeholder="${f.p||''}" value="${val}" oninput="updateBlockVal(${block.id},'${f.k}',this.value)">
+      </div>`;
+  }).join('');
+
+  return `
+  <div class="item-card">
+    <div class="item-card-header">
+      <span class="item-drag">⠿</span>
+      <span class="item-tag code">${def.label}</span>
+      <span class="item-label">Bloco ${idx + 1}</span>
+      <div class="item-actions">
+        <div class="move-btn-group">
+          <button class="item-action-btn" onclick="moveItem(${block.id},-1)" title="Subir" ${idx===0?'disabled':''}>↑</button>
+          <button class="item-action-btn" onclick="moveItem(${block.id},1)" title="Descer" ${idx===items.length-1?'disabled':''}>↓</button>
+        </div>
+        <button class="item-action-btn danger" onclick="removeItem(${block.id})" title="Remover">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="item-card-body">
+      <div class="field-row">${fieldsHTML}</div>
+    </div>
+  </div>`;
+}
+
+/* ── GENERATE ── */
+function generateHTML() {
+  const width = parseInt(document.getElementById('email-width').value);
+  const bg = document.getElementById('email-bg').value;
+  const half = Math.floor(width / 2);
   let rows = '';
 
-  for (const block of codeBlocks) {
-    const v = block.values;
-    if (block.type === 'header') {
-      rows += `\n        <tr><td style="padding:24px 32px 12px;background-color:${v.bg||'#ffffff'};text-align:center;"><p style="margin:0;font-size:${v.size||28}px;font-weight:700;color:${v.color||'#1a2e4a'};font-family:Arial,sans-serif;">${v.text||''}</p></td></tr>`;
-    } else if (block.type === 'text') {
-      const lines = (v.text||'').replace(/\n/g,'<br>');
-      rows += `\n        <tr><td style="padding:12px 32px;background-color:${v.bg||'#ffffff'};"><p style="margin:0;font-size:${v.size||15}px;line-height:1.7;color:${v.color||'#444444'};font-family:Arial,sans-serif;">${lines}</p></td></tr>`;
-    } else if (block.type === 'button') {
-      rows += `\n        <tr><td style="padding:16px 32px;text-align:center;background-color:#ffffff;"><a href="${v.link||'#'}" target="_blank" style="display:inline-block;padding:14px 32px;background-color:${v.bg||'#f5c800'};color:${v.color||'#1a2e4a'};font-family:Arial,sans-serif;font-size:15px;font-weight:700;text-decoration:none;border-radius:50px;">${v.text||'Clique aqui'}</a></td></tr>`;
-    } else if (block.type === 'divider') {
-      rows += `\n        <tr><td style="padding:${v.margin||20}px 32px;background-color:#ffffff;"><hr style="border:none;border-top:1px solid ${v.color||'#eeeeee'};margin:0;"></td></tr>`;
-    } else if (block.type === 'spacer') {
-      rows += `\n        <tr><td style="height:${v.height||20}px;line-height:${v.height||20}px;font-size:1px;">&nbsp;</td></tr>`;
-    } else if (block.type === 'columns') {
-      const halfW = Math.floor(parseInt(width)/2);
-      const l = (v.left||'').replace(/\n/g,'<br>');
-      const r = (v.right||'').replace(/\n/g,'<br>');
-      rows += `\n        <tr><td style="padding:0;background-color:${v.bg||'#ffffff'};"><table width="${width}" cellpadding="0" cellspacing="0" border="0"><tr><td width="${halfW}" style="padding:16px 20px;vertical-align:top;"><p style="margin:0;font-size:14px;line-height:1.6;color:${v.color||'#444444'};font-family:Arial,sans-serif;">${l}</p></td><td width="${halfW}" style="padding:16px 20px;vertical-align:top;border-left:1px solid #eeeeee;"><p style="margin:0;font-size:14px;line-height:1.6;color:${v.color||'#444444'};font-family:Arial,sans-serif;">${r}</p></td></tr></table></td></tr>`;
-    } else if (block.type === 'footer') {
-      const lines = (v.text||'').replace(/\n/g,'<br>');
-      rows += `\n        <tr><td style="padding:20px 32px;background-color:${v.bg||'#f9f9f9'};text-align:center;"><p style="margin:0;font-size:12px;line-height:1.6;color:${v.color||'#999999'};font-family:Arial,sans-serif;">${lines}</p></td></tr>`;
+  for (const item of items) {
+    if (item.mode === 'img') {
+      if (item.type === 'full') {
+        const s = item.slots[0];
+        const imgTag = s.src ? `<img src="${s.src}" width="${width}" style="display:block;border:0;max-width:100%;" alt="">` : '';
+        rows += `\n        <tr><td style="padding:0;line-height:0;">${s.link ? `<a href="${s.link}" target="_blank" style="display:block;">${imgTag}</a>` : imgTag}</td></tr>`;
+      } else {
+        const [s0, s1] = item.slots;
+        const i0 = s0.src ? `<img src="${s0.src}" width="${half}" style="display:block;border:0;max-width:100%;" alt="">` : '';
+        const i1 = s1.src ? `<img src="${s1.src}" width="${half}" style="display:block;border:0;max-width:100%;" alt="">` : '';
+        const c0 = s0.link ? `<a href="${s0.link}" target="_blank" style="display:block;">${i0}</a>` : i0;
+        const c1 = s1.link ? `<a href="${s1.link}" target="_blank" style="display:block;">${i1}</a>` : i1;
+        rows += `\n        <tr><td style="padding:0;"><table width="${width}" cellpadding="0" cellspacing="0" border="0"><tr><td width="${half}" style="padding:0;line-height:0;">${c0}</td><td width="${half}" style="padding:0;line-height:0;">${c1}</td></tr></table></td></tr>`;
+      }
+    } else {
+      const v = item.values;
+      if (item.type === 'header') {
+        rows += `\n        <tr><td style="padding:24px 32px 12px;background-color:${v.bg||'#ffffff'};text-align:${v.align||'center'};"><p style="margin:0;font-size:${v.size||28}px;font-weight:700;color:${v.color||'#1a2e4a'};font-family:Arial,sans-serif;">${v.text||''}</p></td></tr>`;
+      } else if (item.type === 'text') {
+        rows += `\n        <tr><td style="padding:12px 32px;background-color:${v.bg||'#ffffff'};"><p style="margin:0;font-size:${v.size||15}px;line-height:1.7;color:${v.color||'#444444'};font-family:Arial,sans-serif;">${(v.text||'').replace(/\n/g,'<br>')}</p></td></tr>`;
+      } else if (item.type === 'button') {
+        rows += `\n        <tr><td style="padding:16px 32px;text-align:center;background-color:#ffffff;"><a href="${v.link||'#'}" target="_blank" style="display:inline-block;padding:14px 32px;background-color:${v.bg||'#F5C800'};color:${v.color||'#1a2e4a'};font-family:Arial,sans-serif;font-size:15px;font-weight:700;text-decoration:none;border-radius:50px;">${v.text||'Clique aqui'}</a></td></tr>`;
+      } else if (item.type === 'image_url') {
+        const imgTag = `<img src="${v.src||''}" width="${width}" style="display:block;border:0;max-width:100%;" alt="${v.alt||''}">`;
+        rows += `\n        <tr><td style="padding:0;line-height:0;">${v.link ? `<a href="${v.link}" target="_blank" style="display:block;">${imgTag}</a>` : imgTag}</td></tr>`;
+      } else if (item.type === 'columns') {
+        rows += `\n        <tr><td style="background-color:${v.bg||'#ffffff'};"><table width="${width}" cellpadding="0" cellspacing="0" border="0"><tr><td width="${half}" style="padding:16px 20px;vertical-align:top;"><p style="margin:0;font-size:14px;line-height:1.6;color:${v.color||'#444444'};font-family:Arial,sans-serif;">${(v.left||'').replace(/\n/g,'<br>')}</p></td><td width="${half}" style="padding:16px 20px;vertical-align:top;border-left:1px solid #eeeeee;"><p style="margin:0;font-size:14px;line-height:1.6;color:${v.color||'#444444'};font-family:Arial,sans-serif;">${(v.right||'').replace(/\n/g,'<br>')}</p></td></tr></table></td></tr>`;
+      } else if (item.type === 'divider') {
+        rows += `\n        <tr><td style="padding:${v.pad||20}px 32px;background-color:#ffffff;"><hr style="border:none;border-top:1px solid ${v.color||'#eeeeee'};margin:0;"></td></tr>`;
+      } else if (item.type === 'spacer') {
+        rows += `\n        <tr><td style="height:${v.h||20}px;line-height:${v.h||20}px;font-size:1px;">&nbsp;</td></tr>`;
+      } else if (item.type === 'footer') {
+        rows += `\n        <tr><td style="padding:20px 32px;background-color:${v.bg||'#f9f9f9'};text-align:center;"><p style="margin:0;font-size:12px;line-height:1.6;color:${v.color||'#999999'};font-family:Arial,sans-serif;">${(v.text||'').replace(/\n/g,'<br>')}</p></td></tr>`;
+      }
     }
   }
 
-  const html = `<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-</head>
-<body style="margin:0;padding:0;background-color:${bg};">
-<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${bg};">
-  <tr><td align="center" style="padding:20px 0;">
-    <table width="${width}" cellpadding="0" cellspacing="0" border="0" style="max-width:${width}px;width:100%;background-color:#ffffff;">${rows}
-    </table>
-  </td></tr>
-</table>
-</body>
-</html>`;
+  const html = `<!DOCTYPE html>\n<html lang="pt-BR">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<meta http-equiv="X-UA-Compatible" content="IE=edge">\n</head>\n<body style="margin:0;padding:0;background-color:${bg};">\n<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${bg};">\n  <tr><td align="center" style="padding:20px 0;">\n    <table width="${width}" cellpadding="0" cellspacing="0" border="0" style="max-width:${width}px;width:100%;background-color:#ffffff;">${rows}\n    </table>\n  </td></tr>\n</table>\n</body>\n</html>`;
 
-  document.getElementById('code-output').value = html;
-  showStatus('code-status', 'HTML gerado com sucesso!');
+  document.getElementById('html-output').value = html;
+  toast('HTML gerado com sucesso!', 'success');
 }
 
-/* ─────────────────── UTILS ─────────────────── */
-function copyOutput(id) {
-  const el = document.getElementById(id);
-  if (!el.value) return;
-  navigator.clipboard.writeText(el.value).then(() => {
-    const statusId = id === 'img-output' ? 'img-status' : 'code-status';
-    showStatus(statusId, 'Copiado para a área de transferência!');
-  });
+function copyHTML() {
+  const val = document.getElementById('html-output').value;
+  if (!val) { toast('Gere o HTML primeiro'); return; }
+  navigator.clipboard.writeText(val).then(() => toast('Copiado!', 'success'));
 }
 
-function showStatus(id, msg) {
-  const el = document.getElementById(id);
+function downloadHTML() {
+  const val = document.getElementById('html-output').value;
+  if (!val) { toast('Gere o HTML primeiro'); return; }
+  const blob = new Blob([val], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'email-marketing.html';
+  a.click();
+  toast('Download iniciado!', 'success');
+}
+
+function clearAll() {
+  items = [];
+  document.getElementById('html-output').value = '';
+  renderItems();
+}
+
+function toast(msg, type = '') {
+  const el = document.getElementById('toast');
   el.textContent = msg;
-  el.style.display = 'block';
-  setTimeout(() => { el.style.display = 'none'; }, 3000);
+  el.className = 'show' + (type ? ' ' + type : '');
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => { el.className = ''; }, 2800);
 }
 
-renderImgRows();
-renderCodeBlocks();
+renderItems();
 </script>
+</body>
+</html>
